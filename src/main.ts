@@ -55,7 +55,7 @@ k.loadSound("barking", "./sounds/barking.wav");
 k.loadSound("laughing", "./sounds/laughing.wav");
 k.loadSound("successful-hunt", "./sounds/successful-hunt.wav");
 k.loadSound("quacking", "./sounds/quacking.wav");
-k.loadSound("flapping", "./sounds/flapping.wav");
+k.loadSound("flapping", "./sounds/flapping.ogg");
 k.loadSound("fall", "./sounds/fall.wav");
 k.loadSound("impact", "./sounds/impact.wav");
 k.loadSound("forest-ambiance", "./sounds/forest-ambiance.wav");
