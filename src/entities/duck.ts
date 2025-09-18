@@ -1,121 +1,167 @@
-import { COLORS } from "../constants";
-import gameManager from "../gameManager";
+import type { Vec2, GameObj } from "kaplay";
 import k from "../kaplayCtx";
-import type { GameObj } from "kaplay";
+import { BaseEntity } from "../core/entities/BaseEntity";
+import { GameEvents, GAME_EVENTS } from "../core/GameEvents";
+import { GAME_CONFIG } from "../config";
+import { COLORS } from "../config";
+import type { DuckState } from "../types/game";
+import { GameService } from "../services/GameService";
 
-export default function makeDuck(duckId: string, speed: number) {
-  const startingPos = [
-    k.vec2(80, k.center().y + 40),
-    k.vec2(k.center().x, k.center().y + 40),
-    k.vec2(200, k.center().y + 40),
-  ];
+export class Duck extends BaseEntity {
+  private flyTimer: number = 0;
+  private timeBeforeEscape: number = GAME_CONFIG.escapeTime;
+  private position: Vec2;
+  private speed: number;
+  private duckId: string;
+  private flyDirection: Vec2;
+  private quackingSound: any;
+  private flappingSound: any;
+  private fallSound: any;
+  private gameService: GameService;
 
-  const flyDirections = [k.vec2(-1, -1), k.vec2(1, -1), k.vec2(1, -1)];
+  constructor(duckId: string, speed: number) {
+    super();
+    this.duckId = duckId;
+    this.speed = speed;
+    this.gameService = GameService.getInstance();
+    
+    const startingPos = [
+      k.vec2(80, k.center().y + 40),
+      k.vec2(k.center().x, k.center().y + 40),
+      k.vec2(200, k.center().y + 40),
+    ];
+    
+    const flyDirections = [
+      k.vec2(-1, -1),
+      k.vec2(1, -1),
+      k.vec2(1, -1),
+    ];
 
-  const chosenPosIndex = k.randi(startingPos.length);
-  const chosenFlyDirectionIndex = k.randi(flyDirections.length);
+    const chosenPosIndex = k.randi(startingPos.length);
+    const chosenFlyDirectionIndex = k.randi(flyDirections.length);
 
-  return k.add([
-    k.sprite("duck", { anim: "flight-side" }),
-    k.area({
-      shape: new k.Rect(k.vec2(0), 24, 24),
-    }),
-    k.body(),
-    k.anchor("center"),
-    k.pos(startingPos[chosenPosIndex]),
-    k.state("fly", ["fly", "shot", "fall"]),
-    k.timer(),
-    k.offscreen({ destroy: true, distance: 100 }),
-    {
-      flyTimer: 0,
-      timeBeforeEscape: 5,
-      duckId,
-      flyDirections: null,
-      speed,
-      quackingSound: null,
-      flappingSound: null,
-      fallSound: null,
-      setBehavior(this: GameObj) {
-        this.flyDirections = flyDirections[chosenFlyDirectionIndex];
-        if (this.flyDirections.x < 0) this.flipX = true;
-        this.quackingSound = k.play("quacking", { volume: 0.5, loop: true });
-        this.flappingSound = k.play("flapping", { loop: true, speed: 2 });
+    this.position = startingPos[chosenPosIndex];
+    this.flyDirection = flyDirections[chosenFlyDirectionIndex];
+  }
 
-        this.onStateUpdate("fly", () => {
-          const currentAnim =
-            this.getCurAnim().name === "flight-side"
-              ? "flight-diagonal"
-              : "flight-side";
+  protected createGameObject(): GameObj {
+    return k.add([
+      k.sprite("duck", { anim: "flight-side" }),
+      k.area({
+        shape: new k.Rect(k.vec2(0), 24, 24),
+      }),
+      k.body(),
+      k.anchor("center"),
+      k.pos(this.position),
+      k.state("fly", ["fly", "shot", "fall"] as DuckState[]),
+      k.timer(),
+      k.offscreen({ destroy: true, distance: 100 }),
+    ]);
+  }
 
-          if (
-            this.flyTimer < this.timeBeforeEscape &&
-            (this.pos.x > k.width() + 10 || this.pos.x < -10)
-          ) {
-            this.flyDirections.x = -this.flyDirections.x;
-            this.flipX = !this.flipX;
-            this.play(currentAnim);
-          }
-          if (this.pos.y < -10 || this.pos.y > k.height() - 70) {
-            this.flyDirections.y = -this.flyDirections.y;
-            this.play(currentAnim);
-          }
-          this.move(k.vec2(this.flyDirections).scale(this.speed));
-        });
+  setBehavior(): void {
+    if (this.flyDirection.x < 0) this.gameObject.flipX = true;
+    
+    this.quackingSound = k.play("quacking", { volume: 0.5, loop: true });
+    this.flappingSound = k.play("flapping", { loop: true, speed: 2 });
 
-        this.onStateEnter("shot", async () => {
-          gameManager.nbDucksShutInRound++;
-          this.play("shot");
-          this.quackingSound.stop();
-          this.flappingSound.stop();
-          await k.wait(0.2);
-          this.enterState("fall");
-        });
+    this.initializeFlyState();
+    this.initializeShotState();
+    this.initializeFallState();
+    this.setupClickHandler();
+    this.setupEscapeTimer();
+    this.setupOffscreenHandler();
+  }
 
-        this.onStateEnter("fall", () => {
-          this.fallSound = k.play("fall", { volume: 0.7 });
-          this.play("fall");
-        });
+  private initializeFlyState(): void {
+    this.gameObject.onStateUpdate("fly", () => {
+      const currentAnim = this.gameObject.getCurAnim().name === "flight-side"
+        ? "flight-diagonal"
+        : "flight-side";
 
-        this.onStateUpdate("fall", async () => {
-          this.move(0, this.speed);
-          if (this.pos.y > k.height() - 70) {
-            this.fallSound.stop();
-            k.play("impact");
-            k.destroy(this);
-            sky.color = k.Color.fromHex(COLORS.BLUE);
-            const duckIcon = k.get(`duckIcon-${this.duckId}`, {
-              recursive: true,
-            })[0];
-            if (duckIcon) duckIcon.color = k.Color.fromHex(COLORS.RED);
+      if (
+        this.flyTimer < this.timeBeforeEscape &&
+        (this.gameObject.pos.x > k.width() + 10 || this.gameObject.pos.x < -10)
+      ) {
+        this.flyDirection.x = -this.flyDirection.x;
+        this.gameObject.flipX = !this.gameObject.flipX;
+        this.gameObject.play(currentAnim);
+      }
 
-            await k.wait(1);
+      if (this.gameObject.pos.y < -10 || this.gameObject.pos.y > k.height() - 70) {
+        this.flyDirection.y = -this.flyDirection.y;
+        this.gameObject.play(currentAnim);
+      }
 
-            gameManager.enterState("duck-hunted");
-          }
-        });
+      this.gameObject.move(k.vec2(this.flyDirection).scale(this.speed));
+    });
+  }
 
-        this.onClick(() => {
-          if (gameManager.nbBulletLeft <= 0) return;
-          gameManager.currentScore += 100;
-          this.enterState("shot");
-        });
+  private initializeShotState(): void {
+    this.gameObject.onStateEnter("shot", async () => {
+      this.gameService.getManager().nbDucksShutInRound++;
+      this.gameObject.play("shot");
+      this.quackingSound.stop();
+      this.flappingSound.stop();
+      await k.wait(0.2);
+      this.gameObject.enterState("fall");
+    });
+  }
 
-        const sky = k.get("sky")[0];
-        this.loop(1, () => {
-          this.flyTimer++;
-          if (this.flyTimer === this.timeBeforeEscape) {
-            sky.color = k.Color.fromHex(COLORS.BEIGE);
-          }
-        });
+  private initializeFallState(): void {
+    const sky = k.get("sky")[0];
 
-        this.onExitScreen(() => {
-          this.quackingSound.stop();
-          this.flappingSound.stop();
-          sky.color = k.Color.fromHex(COLORS.BLUE);
-          gameManager.nbBulletLeft = 3;
-          gameManager.enterState("duck-escaped");
-        });
-      },
-    },
-  ]);
+    this.gameObject.onStateEnter("fall", () => {
+      this.fallSound = k.play("fall", { volume: 0.7 });
+      this.gameObject.play("fall");
+    });
+
+    this.gameObject.onStateUpdate("fall", async () => {
+      this.gameObject.move(0, this.speed);
+      if (this.gameObject.pos.y > k.height() - 70) {
+        this.fallSound.stop();
+        k.play("impact");
+        k.destroy(this.gameObject);
+        sky.color = k.Color.fromHex(COLORS.BLUE);
+        
+        const duckIcon = k.get(`duckIcon-${this.duckId}`, { recursive: true })[0];
+        if (duckIcon) duckIcon.color = k.Color.fromHex(COLORS.RED);
+
+        await k.wait(1);
+        GameEvents.getInstance().emit(GAME_EVENTS.HUNT_END);
+      }
+    });
+  }
+
+  private setupClickHandler(): void {
+    this.gameObject.onClick(() => {
+      if (this.gameService.getManager().nbBulletLeft <= 0) return;
+      this.gameService.addScore(GAME_CONFIG.duckHitScore);
+      this.gameObject.enterState("shot");
+    });
+  }
+
+  private setupEscapeTimer(): void {
+    const sky = k.get("sky")[0];
+    
+    this.gameObject.loop(1, () => {
+      this.flyTimer++;
+      if (this.flyTimer === this.timeBeforeEscape) {
+        sky.color = k.Color.fromHex(COLORS.BEIGE);
+      }
+    });
+  }
+
+  private setupOffscreenHandler(): void {
+    this.gameObject.onExitScreen(() => {
+      this.quackingSound.stop();
+      this.flappingSound.stop();
+      
+      const sky = k.get("sky")[0];
+      sky.color = k.Color.fromHex(COLORS.BLUE);
+      
+      this.gameService.getManager().nbBulletLeft = GAME_CONFIG.maxBullets;
+      GameEvents.getInstance().emit(GAME_EVENTS.DUCK_ESCAPED);
+    });
+  }
 }
