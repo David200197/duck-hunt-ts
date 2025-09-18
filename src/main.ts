@@ -167,8 +167,7 @@ k.scene("game", () => {
 
   const roundEndController = gameManager.onStateEnter("round-end", () => {
     if (gameManager.nbDucksShutInRound < 6) return k.go("game-over");
-    if (gameManager.nbDucksShutInRound === 10)
-      return (gameManager.currentScore += 500);
+    if (gameManager.nbDucksShutInRound === 10) gameManager.currentScore += 500;
 
     gameManager.nbDucksShutInRound = 0;
     for (const duckIcon of duckIcons.children) {
