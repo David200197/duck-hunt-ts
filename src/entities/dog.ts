@@ -91,10 +91,10 @@ export default function makeDog(position: Vec2) {
       },
       async mockPlayer(this: GameObj) {
         const laughingSound = playLaughingSound();
-        this.play("mock")
+        this.play("mock");
         await this.slideUpAndDown();
         laughingSound.stop();
-        gameManager.enterState("hunt-end")
+        gameManager.enterState("hunt-end");
       },
     },
   ]);

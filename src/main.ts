@@ -121,7 +121,12 @@ k.scene("game", () => {
 
   const duckIcons = k.add([k.pos(95, 198)]);
   for (let i = 0; i < 10; i++) {
-    duckIcons.add([k.rect(7, 9), k.pos(1 + 8 * i, 0), `duckIcon-${i}`]);
+    duckIcons.add([
+      k.rect(7, 9),
+      k.pos(1 + 8 * i, 0),
+      k.color(255, 255, 255),
+      `duckIcon-${i}`,
+    ]);
   }
 
   const bulletUIMask = k.add([
@@ -171,7 +176,7 @@ k.scene("game", () => {
 
     gameManager.nbDucksShutInRound = 0;
     for (const duckIcon of duckIcons.children) {
-      duckIcon.color = k.color(255, 255, 255);
+      duckIcon.use(k.color(255, 255, 255));
     }
 
     gameManager.enterState("round-start");
@@ -213,8 +218,6 @@ k.scene("game", () => {
       dog.mockPlayer();
     }
   );
-
-  //gameManager.enterState("round-start")
 
   const cursor = k.add([
     k.sprite("cursor"),
