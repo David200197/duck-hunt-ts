@@ -5,11 +5,11 @@ import gameManager from "./gameManager";
 import k from "./kaplayCtx";
 import { formatScore } from "./utils";
 
-k.loadSprite("menu", "./graphics/menu.png");
-k.loadSprite("background", "./graphics/background.png");
-k.loadSprite("cursor", "./graphics/cursor.png");
-k.loadSprite("text-box", "./graphics/text-box.png");
-k.loadSprite("dog", "./graphics/dog.png", {
+k.loadSprite("menu", "./duck-hunt-ts/graphics/menu.png");
+k.loadSprite("background", "./duck-hunt-ts/graphics/background.png");
+k.loadSprite("cursor", "./duck-hunt-ts/graphics/cursor.png");
+k.loadSprite("text-box", "./duck-hunt-ts/graphics/text-box.png");
+k.loadSprite("dog", "./duck-hunt-ts/graphics/dog.png", {
   sliceX: 4,
   sliceY: 3,
   anims: {
@@ -35,7 +35,7 @@ k.loadSprite("dog", "./graphics/dog.png", {
     mock: { from: 10, to: 11, loop: true },
   },
 });
-k.loadSprite("duck", "./graphics/duck.png", {
+k.loadSprite("duck", "./duck-hunt-ts/graphics/duck.png", {
   sliceX: 8,
   sliceY: 1,
   anims: {
@@ -46,19 +46,19 @@ k.loadSprite("duck", "./graphics/duck.png", {
   },
 });
 
-k.loadFont("nes", "./fonts/nintendo-nes-font/nintendo-nes-font.ttf");
+k.loadFont("nes", "./duck-hunt-ts/fonts/nintendo-nes-font/nintendo-nes-font.ttf");
 
-k.loadSound("gun-shot", "./sounds/gun-shot.wav");
-k.loadSound("ui-appear", "./sounds/ui-appear.wav");
-k.loadSound("sniffing", "./sounds/sniffing.wav");
-k.loadSound("barking", "./sounds/barking.wav");
-k.loadSound("laughing", "./sounds/laughing.wav");
-k.loadSound("successful-hunt", "./sounds/successful-hunt.wav");
-k.loadSound("quacking", "./sounds/quacking.wav");
-k.loadSound("flapping", "./sounds/flapping.wav");
-k.loadSound("fall", "./sounds/fall.wav");
-k.loadSound("impact", "./sounds/impact.wav");
-k.loadSound("forest-ambiance", "./sounds/forest-ambiance.wav");
+k.loadSound("gun-shot", "./duck-hunt-ts/sounds/gun-shot.wav");
+k.loadSound("ui-appear", "./duck-hunt-ts/sounds/ui-appear.wav");
+k.loadSound("sniffing", "./duck-hunt-ts/sounds/sniffing.wav");
+k.loadSound("barking", "./duck-hunt-ts/sounds/barking.wav");
+k.loadSound("laughing", "./duck-hunt-ts/sounds/laughing.wav");
+k.loadSound("successful-hunt", "./duck-hunt-ts/sounds/successful-hunt.wav");
+k.loadSound("quacking", "./duck-hunt-ts/sounds/quacking.wav");
+k.loadSound("flapping", "./duck-hunt-ts/sounds/flapping.wav");
+k.loadSound("fall", "./duck-hunt-ts/sounds/fall.wav");
+k.loadSound("impact", "./duck-hunt-ts/sounds/impact.wav");
+k.loadSound("forest-ambiance", "./duck-hunt-ts/sounds/forest-ambiance.wav");
 
 k.scene("main-menu", () => {
   k.add([k.sprite("menu")]);
