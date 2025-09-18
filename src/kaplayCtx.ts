@@ -7,7 +7,7 @@ const k = kaplay({
   touchToMouse: true,
   scale: 4,
   pixelDensity: devicePixelRatio,
-  debug: false,
+  debug: process.env.NODE_ENV !== "production",
   background: [0, 0, 0],
   global: true,
 });

@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  base: "/duck-hunt-ts",
+  base: process.env.NODE_ENV === "production" ? "/duck-hunt-ts" : "/",
 });
