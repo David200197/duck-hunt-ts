@@ -1,4 +1,4 @@
 export const KOZMOPLAY_CONSTANTS = {
   K: Symbol.for("KAYPAL_INSTANCE"),
-  SCENE_METADATA: Symbol("scene:metadata"),
+  KEYPRESS_METADATA: Symbol("keypress:metadata"),
 };

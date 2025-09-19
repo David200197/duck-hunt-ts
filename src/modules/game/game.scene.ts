@@ -25,6 +25,7 @@ import type {
   TextComp,
   ZComp,
 } from "kaplay";
+import { KeyPress } from "../../kozmoplay/decorators/key-press";
 
 @Scene("game")
 export class GameScene
@@ -190,27 +191,6 @@ export class GameScene
       volume: 0.1,
       loop: true,
     });
-
-    k.onKeyPress("enter", () => {
-      k.getTreeRoot().paused = !k.getTreeRoot().paused;
-      gameManager.isGamePaused = k.getTreeRoot().paused;
-      if (gameManager.isGamePaused) {
-        //@ts-ignore
-        audioCtx.suspend();
-        k.add([
-          k.text("PAUSED", fontConfig),
-          k.pos(5, 5),
-          k.z(3),
-          "paused-text",
-        ]);
-        return;
-      }
-      //@ts-ignore
-      audioCtx.resume();
-
-      const pausedText = k.get("paused-text")[0];
-      if (pausedText) k.destroy(pausedText);
-    });
   }
 
   onUpdate(): void {
@@ -253,5 +233,23 @@ export class GameScene
     this.duckHuntedController?.cancel();
     this.duckEscapedController?.cancel();
     this.gameManager.data.resetGameState();
+  }
+
+  @KeyPress("enter")
+  onKeyPressEnter() {
+    const k = this.k;
+    k.getTreeRoot().paused = !k.getTreeRoot().paused;
+    this.gameManager.data.isGamePaused = k.getTreeRoot().paused;
+    if (this.gameManager.data.isGamePaused) {
+      //@ts-ignore
+      audioCtx.suspend();
+      k.add([k.text("PAUSED", fontConfig), k.pos(5, 5), k.z(3), "paused-text"]);
+      return;
+    }
+    //@ts-ignore
+    audioCtx.resume();
+
+    const pausedText = k.get("paused-text")[0];
+    if (pausedText) k.destroy(pausedText);
   }
 }

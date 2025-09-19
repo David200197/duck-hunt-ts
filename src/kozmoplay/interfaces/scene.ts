@@ -16,7 +16,10 @@ export interface OnUpdateScene {
   onUpdate(): void;
 }
 
+export type AdditionalProps = Record<string, any>;
+
 export type SceneManager = OnLoadScene &
   OnLeaveScene &
   OnClickScene &
-  OnUpdateScene;
+  OnUpdateScene &
+  AdditionalProps;

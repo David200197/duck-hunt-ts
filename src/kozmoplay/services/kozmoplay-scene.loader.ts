@@ -3,6 +3,7 @@ import { Injectable } from "../decorators/injectable";
 import type { Kaplay } from "../interfaces/kaplay";
 import { SceneRegistry } from "../libs/SceneRegistry";
 import type { SceneManager } from "../interfaces/scene";
+import { KeyPressRegistry } from "../libs/KeyPressRegistry";
 
 @Injectable()
 export class KozmoplaySceneLoader {
@@ -10,6 +11,13 @@ export class KozmoplaySceneLoader {
 
   constructor(@InjectK() k: Kaplay) {
     this.k = k;
+  }
+
+  private renderKeyPress(sceneService: SceneManager, sceneName: string) {
+    const keyPressMetadata = KeyPressRegistry.get(sceneName);
+    for (const { keys, methodName } of keyPressMetadata) {
+      this.k.onKeyPress(keys, () => sceneService?.[methodName]());
+    }
   }
 
   loadScenes(getSceneService: (target: Function) => SceneManager) {
@@ -23,6 +31,7 @@ export class KozmoplaySceneLoader {
         this.k.onSceneLeave((newScene) => {
           sceneService?.onLeave?.(newScene);
         });
+        this.renderKeyPress(sceneService, name);
       });
     }
   }

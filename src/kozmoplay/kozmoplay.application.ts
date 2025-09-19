@@ -9,7 +9,6 @@ import kaplay from "kaplay";
 import { KOZMOPLAY_CONSTANTS } from "./constants/kozmoplay.constants";
 import type { Kaplay, KaplayConfig } from "./interfaces/kaplay";
 import { KozmoplayResourceLoader } from "./services/kozmoplay-resource.loader";
-import type { OnLoadScene } from "./interfaces/scene";
 import { KozmoplaySceneLoader } from "./services/kozmoplay-scene.loader";
 
 export class KozmoplayApplication {
