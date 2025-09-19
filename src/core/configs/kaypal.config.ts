@@ -1,4 +1,4 @@
-import type { KaplayConfig } from "../../../kozmoplay/interfaces/kaplay";
+import type { KaplayConfig } from "../../kozmoplay/interfaces/kaplay";
 
 export const kaplayConfig: KaplayConfig = {
   width: 256,

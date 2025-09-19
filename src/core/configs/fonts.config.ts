@@ -1,4 +1,4 @@
-import type { Fonts } from "../../../kozmoplay/interfaces/fonts";
+import type { Fonts } from "../../kozmoplay/interfaces/fonts";
 
 export const FontsConfig = {
   nes: "./fonts/nintendo-nes-font/nintendo-nes-font.ttf",

@@ -1,8 +1,8 @@
-import { fontConfig } from "../../../../constants";
-import { InjectK } from "../../../kozmoplay/decorators/inject-k";
-import { Scene } from "../../../kozmoplay/decorators/scene";
-import type { Kaplay } from "../../../kozmoplay/interfaces/kaplay";
-import type { SceneManager } from "../../../kozmoplay/interfaces/scene-manager";
+import { fontConfig } from "../../core/constants/game.constants";
+import { InjectK } from "../../kozmoplay/decorators/inject-k";
+import { Scene } from "../../kozmoplay/decorators/scene";
+import type { Kaplay } from "../../kozmoplay/interfaces/kaplay";
+import type { SceneManager } from "../../kozmoplay/interfaces/scene-manager";
 
 @Scene("game-over")
 export class GameOverScene implements SceneManager {

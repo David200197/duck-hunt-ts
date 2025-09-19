@@ -1,16 +1,20 @@
 import type { GameObj } from "kaplay";
-import { InjectK } from "../../../kozmoplay/decorators/inject-k";
-import { Injectable } from "../../../kozmoplay/decorators/injectable";
-import type { Kaplay } from "../../../kozmoplay/interfaces/kaplay";
-import type { GameManager } from "./game.manager";
-import { COLORS } from "../../../../constants";
+import { InjectK } from "../../kozmoplay/decorators/inject-k";
+import { Injectable } from "../../kozmoplay/decorators/injectable";
+import type { Kaplay } from "../../kozmoplay/interfaces/kaplay";
+import { GameManager } from "./game.manager";
+import { Inject } from "../../kozmoplay/decorators/inject";
+import { COLORS } from "../../core/constants/game.constants";
 
 @Injectable()
 export class DuckMaker {
   private readonly k: Kaplay;
   private readonly gameManager: GameManager;
 
-  constructor(@InjectK() k: Kaplay, gameManager: GameManager) {
+  constructor(
+    @InjectK() k: Kaplay,
+    @Inject(GameManager) gameManager: GameManager
+  ) {
     this.k = k;
     this.gameManager = gameManager;
   }

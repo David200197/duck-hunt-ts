@@ -1,15 +1,19 @@
 import type { Vec2, GameObj } from "kaplay";
-import { InjectK } from "../../../kozmoplay/decorators/inject-k";
-import { Injectable } from "../../../kozmoplay/decorators/injectable";
-import type { Kaplay } from "../../../kozmoplay/interfaces/kaplay";
-import type { GameManager } from "./game.manager";
+import { InjectK } from "../../kozmoplay/decorators/inject-k";
+import { Injectable } from "../../kozmoplay/decorators/injectable";
+import type { Kaplay } from "../../kozmoplay/interfaces/kaplay";
+import { GameManager } from "./game.manager";
+import { Inject } from "../../kozmoplay/decorators/inject";
 
 @Injectable()
 export class DogMaker {
   private readonly k: Kaplay;
   private readonly gameManager: GameManager;
 
-  constructor(@InjectK() k: Kaplay, gameManager: GameManager) {
+  constructor(
+    @InjectK() k: Kaplay,
+    @Inject(GameManager) gameManager: GameManager
+  ) {
     this.k = k;
     this.gameManager = gameManager;
   }

@@ -1,7 +1,7 @@
 import type { GameObj, StateComp } from "kaplay";
-import { Injectable } from "../../../kozmoplay/decorators/injectable";
-import { InjectK } from "../../../kozmoplay/decorators/inject-k";
-import type { Kaplay } from "../../../kozmoplay/interfaces/kaplay";
+import { Injectable } from "../../kozmoplay/decorators/injectable";
+import { InjectK } from "../../kozmoplay/decorators/inject-k";
+import type { Kaplay } from "../../kozmoplay/interfaces/kaplay";
 
 type GameManagerData = GameObj<
   | StateComp

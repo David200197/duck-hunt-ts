@@ -1,7 +1,7 @@
-import { InjectK } from "../../../kozmoplay/decorators/inject-k";
-import { Scene } from "../../../kozmoplay/decorators/scene";
-import type { Kaplay } from "../../../kozmoplay/interfaces/kaplay";
-import type { SceneManager } from "../../../kozmoplay/interfaces/scene-manager";
+import { InjectK } from "../../kozmoplay/decorators/inject-k";
+import { Scene } from "../../kozmoplay/decorators/scene";
+import type { Kaplay } from "../../kozmoplay/interfaces/kaplay";
+import type { SceneManager } from "../../kozmoplay/interfaces/scene-manager";
 import { COLORS } from "../../core/constants/game.constants";
 import { formatScore } from "../../core/utils/formatScore";
 

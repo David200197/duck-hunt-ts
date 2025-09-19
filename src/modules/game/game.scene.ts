@@ -1,12 +1,13 @@
-import { COLORS, fontConfig } from "../../../../constants";
-import { InjectK } from "../../../kozmoplay/decorators/inject-k";
-import { Scene } from "../../../kozmoplay/decorators/scene";
-import type { Kaplay } from "../../../kozmoplay/interfaces/kaplay";
-import type { SceneManager } from "../../../kozmoplay/interfaces/scene-manager";
+import { Inject } from "../../kozmoplay/decorators/inject";
+import { InjectK } from "../../kozmoplay/decorators/inject-k";
+import { Scene } from "../../kozmoplay/decorators/scene";
+import type { Kaplay } from "../../kozmoplay/interfaces/kaplay";
+import type { SceneManager } from "../../kozmoplay/interfaces/scene-manager";
 import { formatScore } from "../../core/utils/formatScore";
-import type { DogMaker } from "./dog.maker";
-import type { DuckMaker } from "./duck.maker";
-import type { GameManager } from "./game.manager";
+import { DogMaker } from "./dog.maker";
+import { DuckMaker } from "./duck.maker";
+import { GameManager } from "./game.manager";
+import { COLORS, fontConfig } from "../../core/constants/game.constants";
 
 @Scene("game")
 export class GameScene implements SceneManager {
@@ -17,9 +18,9 @@ export class GameScene implements SceneManager {
 
   constructor(
     @InjectK() k: Kaplay,
-    gameManager: GameManager,
-    dogMaker: DogMaker,
-    duckMaker: DuckMaker
+    @Inject(GameManager) gameManager: GameManager,
+    @Inject(DogMaker) dogMaker: DogMaker,
+    @Inject(DuckMaker) duckMaker: DuckMaker
   ) {
     this.k = k;
     this.gameManager = gameManager;

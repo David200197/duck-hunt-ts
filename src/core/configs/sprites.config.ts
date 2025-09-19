@@ -1,4 +1,4 @@
-import type { Sprites } from "../../../kozmoplay/interfaces/sprites";
+import type { Sprites } from "../../kozmoplay/interfaces/sprites";
 
 export const SpritesConfig = {
   menu: "./graphics/menu.png",

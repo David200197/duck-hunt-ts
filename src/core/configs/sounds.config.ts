@@ -1,4 +1,4 @@
-import type { Sounds } from "../../../kozmoplay/interfaces/sounds";
+import type { Sounds } from "../../kozmoplay/interfaces/sounds";
 
 export const SoundsConfig = {
   "gun-shot": "./sounds/gun-shot.wav",
