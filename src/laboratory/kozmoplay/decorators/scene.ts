@@ -1,4 +1,3 @@
-import "reflect-metadata";
 import { Injectable } from "./injectable";
 import { SceneRegistry } from "../libs/SceneRegistry";
 
