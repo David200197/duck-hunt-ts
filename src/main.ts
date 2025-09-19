@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import { COLORS, fontConfig } from "./constants";
 import makeDog from "./entities/dog";
 import makeDuck from "./entities/duck";
