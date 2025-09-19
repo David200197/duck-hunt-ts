@@ -1,19 +1,19 @@
 import { InjectK } from "../../kozmoplay/decorators/inject-k";
 import { Scene } from "../../kozmoplay/decorators/scene";
 import type { Kaplay } from "../../kozmoplay/interfaces/kaplay";
-import type { SceneManager } from "../../kozmoplay/interfaces/scene-manager";
+import type { OnLoadScene } from "../../kozmoplay/interfaces/scene";
 import { COLORS } from "../../core/constants/game.constants";
 import { formatScore } from "../../core/utils/formatScore";
 
 @Scene("main-menu")
-export class MainMenuScene implements SceneManager {
+export class MainMenuScene implements OnLoadScene {
   private readonly k: Kaplay;
 
   constructor(@InjectK() k: Kaplay) {
     this.k = k;
   }
 
-  load() {
+  onLoad() {
     const k = this.k;
 
     k.add([k.sprite("menu")]);

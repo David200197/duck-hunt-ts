@@ -2,19 +2,48 @@ import { Inject } from "../../kozmoplay/decorators/inject";
 import { InjectK } from "../../kozmoplay/decorators/inject-k";
 import { Scene } from "../../kozmoplay/decorators/scene";
 import type { Kaplay } from "../../kozmoplay/interfaces/kaplay";
-import type { SceneManager } from "../../kozmoplay/interfaces/scene-manager";
+import type {
+  OnClickScene,
+  OnLeaveScene,
+  OnLoadScene,
+  OnUpdateScene,
+} from "../../kozmoplay/interfaces/scene";
 import { formatScore } from "../../core/utils/formatScore";
 import { DogMaker } from "./dog.maker";
 import { DuckMaker } from "./duck.maker";
 import { GameManager } from "./game.manager";
 import { COLORS, fontConfig } from "../../core/constants/game.constants";
+import type {
+  AnchorComp,
+  AudioPlay,
+  ColorComp,
+  GameObj,
+  KEventController,
+  PosComp,
+  RectComp,
+  SpriteComp,
+  TextComp,
+  ZComp,
+} from "kaplay";
 
 @Scene("game")
-export class GameScene implements SceneManager {
+export class GameScene
+  implements OnLoadScene, OnLeaveScene, OnClickScene, OnUpdateScene
+{
   private readonly k: Kaplay;
   private readonly gameManager: GameManager;
   private readonly dogMaker: DogMaker;
   private readonly duckMaker: DuckMaker;
+  private roundStartController?: KEventController;
+  private roundEndController?: KEventController;
+  private huntStartController?: KEventController;
+  private huntEndController?: KEventController;
+  private duckHuntedController?: KEventController;
+  private duckEscapedController?: KEventController;
+  private forestAmbianceSound?: AudioPlay;
+  private score?: GameObj<PosComp | ZComp | TextComp>;
+  private bulletUIMask?: GameObj<PosComp | ZComp | RectComp | ColorComp>;
+  private cursor?: GameObj<PosComp | ZComp | SpriteComp | AnchorComp>;
 
   constructor(
     @InjectK() k: Kaplay,
@@ -28,7 +57,7 @@ export class GameScene implements SceneManager {
     this.duckMaker = duckMaker;
   }
 
-  load() {
+  onLoad() {
     const k = this.k;
     const gameManager = this.gameManager.data;
 
@@ -36,7 +65,7 @@ export class GameScene implements SceneManager {
     k.add([k.rect(k.width(), k.height()), k.color(COLORS.BLUE), "sky"]);
     k.add([k.sprite("background"), k.pos(0, -10), k.z(1)]);
 
-    const score = k.add([
+    this.score = k.add([
       k.text(formatScore(0, 6), fontConfig),
       k.pos(192, 197),
       k.z(2),
@@ -59,7 +88,7 @@ export class GameScene implements SceneManager {
       ]);
     }
 
-    const bulletUIMask = k.add([
+    this.bulletUIMask = k.add([
       k.rect(0, 8),
       k.pos(25, 198),
       k.z(2),
@@ -69,7 +98,7 @@ export class GameScene implements SceneManager {
     const dog = this.dogMaker.make(k.vec2(0, k.center().y));
     dog.searchForDucks();
 
-    const roundStartController = gameManager.onStateEnter(
+    this.roundStartController = gameManager.onStateEnter(
       "round-start",
       async (isFirstRound: boolean) => {
         if (!isFirstRound) gameManager.preySpeed += 50;
@@ -100,7 +129,7 @@ export class GameScene implements SceneManager {
       }
     );
 
-    const roundEndController = gameManager.onStateEnter("round-end", () => {
+    this.roundEndController = gameManager.onStateEnter("round-end", () => {
       if (gameManager.nbDucksShutInRound < 6) return k.go("game-over");
       if (gameManager.nbDucksShutInRound === 10)
         gameManager.currentScore += 500;
@@ -113,7 +142,7 @@ export class GameScene implements SceneManager {
       gameManager.enterState("round-start");
     });
 
-    const huntStartController = gameManager.onStateEnter("hunt-start", () => {
+    this.huntStartController = gameManager.onStateEnter("hunt-start", () => {
       gameManager.currentHuntNb++;
       const duck = this.duckMaker.make(
         String(gameManager.currentHuntNb - 1),
@@ -122,7 +151,7 @@ export class GameScene implements SceneManager {
       duck.setBehavior();
     });
 
-    const huntEndController = gameManager.onStateEnter("hunt-end", () => {
+    this.huntEndController = gameManager.onStateEnter("hunt-end", () => {
       const bestScore = k.getData<number>("best-score") || 0;
 
       if (bestScore < gameManager.currentScore)
@@ -135,7 +164,7 @@ export class GameScene implements SceneManager {
       gameManager.enterState("round-end");
     });
 
-    const duckHuntedController = gameManager.onStateEnter(
+    this.duckHuntedController = gameManager.onStateEnter(
       "duck-hunted",
       async () => {
         gameManager.nbBulletLeft = 3;
@@ -143,59 +172,23 @@ export class GameScene implements SceneManager {
       }
     );
 
-    const duckEscapedController = gameManager.onStateEnter(
+    this.duckEscapedController = gameManager.onStateEnter(
       "duck-escaped",
       async () => {
         dog.mockPlayer();
       }
     );
 
-    const cursor = k.add([
+    this.cursor = k.add([
       k.sprite("cursor"),
       k.anchor("center"),
       k.pos(),
       k.z(3),
     ]);
 
-    k.onClick(() => {
-      if (gameManager.state === "hunt-start" && !gameManager.isGamePaused) {
-        if (gameManager.nbBulletLeft > 0) {
-          k.play("gun-shot", { volume: 0.5 });
-          gameManager.nbBulletLeft--;
-        }
-      }
-    });
-
-    k.onUpdate(() => {
-      score.text = formatScore(gameManager.currentScore, 6);
-
-      const nbBulletLeftsToBulletUIMaskWidthMap: Record<number, number> = {
-        3: 0,
-        2: 8,
-        1: 15,
-        0: 21,
-      };
-
-      bulletUIMask.width =
-        nbBulletLeftsToBulletUIMaskWidthMap[gameManager.nbBulletLeft] || 0;
-
-      cursor.moveTo(k.mousePos());
-    });
-
-    const forestAmbianceSound = k.play("forest-ambiance", {
+    this.forestAmbianceSound = k.play("forest-ambiance", {
       volume: 0.1,
       loop: true,
-    });
-
-    k.onSceneLeave(() => {
-      forestAmbianceSound.stop();
-      roundStartController.cancel();
-      roundEndController.cancel();
-      huntStartController.cancel();
-      huntEndController.cancel();
-      duckHuntedController.cancel();
-      duckEscapedController.cancel();
-      gameManager.resetGameState();
     });
 
     k.onKeyPress("enter", () => {
@@ -218,5 +211,47 @@ export class GameScene implements SceneManager {
       const pausedText = k.get("paused-text")[0];
       if (pausedText) k.destroy(pausedText);
     });
+  }
+
+  onUpdate(): void {
+    if (!this.score || !this.bulletUIMask || !this.cursor) return;
+
+    this.score.text = formatScore(this.gameManager.data.currentScore, 6);
+
+    const nbBulletLeftsToBulletUIMaskWidthMap: Record<number, number> = {
+      3: 0,
+      2: 8,
+      1: 15,
+      0: 21,
+    };
+
+    this.bulletUIMask.width =
+      nbBulletLeftsToBulletUIMaskWidthMap[this.gameManager.data.nbBulletLeft] ||
+      0;
+
+    this.cursor.moveTo(this.k.mousePos());
+  }
+
+  onClick(): void {
+    if (
+      this.gameManager.data.state === "hunt-start" &&
+      !this.gameManager.data.isGamePaused
+    ) {
+      if (this.gameManager.data.nbBulletLeft > 0) {
+        this.k.play("gun-shot", { volume: 0.5 });
+        this.gameManager.data.nbBulletLeft--;
+      }
+    }
+  }
+
+  onLeave() {
+    this.forestAmbianceSound?.stop();
+    this.roundStartController?.cancel();
+    this.roundEndController?.cancel();
+    this.huntStartController?.cancel();
+    this.huntEndController?.cancel();
+    this.duckHuntedController?.cancel();
+    this.duckEscapedController?.cancel();
+    this.gameManager.data.resetGameState();
   }
 }

@@ -9,8 +9,8 @@ import kaplay from "kaplay";
 import { KOZMOPLAY_CONSTANTS } from "./constants/kozmoplay.constants";
 import type { Kaplay, KaplayConfig } from "./interfaces/kaplay";
 import { KozmoplayResourceLoader } from "./services/kozmoplay-resource.loader";
-import type { SceneManager } from "./interfaces/scene-manager";
-import { KozmoplayManager } from "./services/kozmoplay.manager";
+import type { OnLoadScene } from "./interfaces/scene";
+import { KozmoplaySceneLoader } from "./services/kozmoplay-scene.loader";
 
 export class KozmoplayApplication {
   private readonly container: Container;
@@ -55,12 +55,8 @@ export class KozmoplayApplication {
 
   public async run(scene: string): Promise<void> {
     const k = this.get<Kaplay>(KOZMOPLAY_CONSTANTS.K);
-    const kozmoplayManager = this.container.get(KozmoplayManager);
-
-    kozmoplayManager.loadScenes((target) =>
-      this.container.get<SceneManager>(target)
-    );
-
+    const kozmoplaySceneLoader = this.container.get(KozmoplaySceneLoader);
+    kozmoplaySceneLoader.loadScenes((target) => this.container.get(target));
     k.go(scene);
   }
 }
