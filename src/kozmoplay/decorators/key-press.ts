@@ -1,11 +1,13 @@
 // key-press.ts
 import type { Key } from "kaplay";
-import { KOZMOPLAY_CONSTANTS } from "../constants/kozmoplay.constants";
-import type { KeyPressMetadata } from "../libs/KeyPressRegistry";
+import {
+  KeyPressRegistry,
+  type KeyPressMetadata,
+} from "../libs/KeyPressRegistry";
 
 export const KeyPress = (key: Key | Key[]): MethodDecorator => {
   return (
-    target: object,
+    target: Object,
     methodName: string | symbol,
     descriptor: PropertyDescriptor
   ) => {
@@ -17,22 +19,13 @@ export const KeyPress = (key: Key | Key[]): MethodDecorator => {
       );
     }
 
-    const existingMetadata: KeyPressMetadata[] =
-      Reflect.getMetadata(
-        KOZMOPLAY_CONSTANTS.KEYPRESS_METADATA,
-        target
-      ) || [];
-
-    const newMetadata: KeyPressMetadata = {
+    const metadata: KeyPressMetadata = {
       keys,
       methodName: String(methodName),
+      target: target.constructor,
     };
 
-    Reflect.defineMetadata(
-      KOZMOPLAY_CONSTANTS.KEYPRESS_METADATA,
-      [...existingMetadata, newMetadata],
-      target
-    );
+    KeyPressRegistry.set(metadata);
 
     return descriptor;
   };

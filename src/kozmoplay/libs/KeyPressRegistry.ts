@@ -3,20 +3,27 @@ import type { Key } from "kaplay";
 export type KeyPressMetadata = {
   methodName: string;
   keys: Key[];
+  target: Function;
 };
 
+const KEYPRESS_METADATA = Symbol.for("KEYPRESS_METADATA");
+
 export class KeyPressRegistry {
-  private static store = new Map<string, Array<KeyPressMetadata>>();
+  static set(metadata: KeyPressMetadata) {
+    const existingMetadata = this.get(metadata.target);
 
-  static set(sceneName: string, metadata: KeyPressMetadata) {
-    if (!this.store.has(sceneName)) {
-      this.store.set(sceneName, []);
-    }
+    existingMetadata.push(metadata);
 
-    this.store.get(sceneName)!.push(metadata);
+    Reflect.defineMetadata(
+      KEYPRESS_METADATA,
+      existingMetadata,
+      metadata.target
+    );
   }
 
-  static get(sceneName: string) {
-    return this.store.get(sceneName) || [];
+  static get(target: Function): KeyPressMetadata[] {
+    const metadata = Reflect.getMetadata(KEYPRESS_METADATA, target);
+    if (!metadata) return [];
+    return [...metadata];
   }
 }

@@ -13,8 +13,8 @@ export class KozmoplaySceneLoader {
     this.k = k;
   }
 
-  private renderKeyPress(sceneService: SceneManager, sceneName: string) {
-    const keyPressMetadata = KeyPressRegistry.get(sceneName);
+  private renderKeyPress(sceneService: SceneManager, target: Function) {
+    const keyPressMetadata = KeyPressRegistry.get(target);
     for (const { keys, methodName } of keyPressMetadata) {
       this.k.onKeyPress(keys, () => sceneService?.[methodName]());
     }
@@ -31,7 +31,7 @@ export class KozmoplaySceneLoader {
         this.k.onSceneLeave((newScene) => {
           sceneService?.onLeave?.(newScene);
         });
-        this.renderKeyPress(sceneService, name);
+        this.renderKeyPress(sceneService, target);
       });
     }
   }
