@@ -1,10 +1,10 @@
 import type { GameObj } from "kaplay";
-import { InjectK } from "../../kozmoplay/decorators/inject-k";
-import { Injectable } from "../../kozmoplay/decorators/injectable";
-import type { Kaplay } from "../../kozmoplay/interfaces/kaplay";
-import { GameManager } from "./game.manager";
-import { Inject } from "../../kozmoplay/decorators/inject";
-import { COLORS } from "../../core/constants/game.constants";
+import { InjectK } from "../../../kozmoplay/decorators/inject-k";
+import { Injectable } from "../../../kozmoplay/decorators/injectable";
+import type { Kaplay } from "../../../kozmoplay/interfaces/kaplay";
+import { GameManager } from "../game.manager";
+import { Inject } from "../../../kozmoplay/decorators/inject";
+import { COLORS } from "../../../core/constants/game.constants";
 
 @Injectable()
 export class DuckMaker {
@@ -21,7 +21,7 @@ export class DuckMaker {
 
   make(duckId: string, speed: number) {
     const k = this.k;
-    const gameManager = this.gameManager.data;
+    const gameManager = this.gameManager;
     const startingPos = [
       k.vec2(80, k.center().y + 40),
       k.vec2(k.center().x, k.center().y + 40),
@@ -108,7 +108,7 @@ export class DuckMaker {
 
               await k.wait(1);
 
-              gameManager.enterState("duck-hunted");
+              gameManager.state.enterState("duck-hunted");
             }
           });
 
@@ -131,7 +131,7 @@ export class DuckMaker {
             this.flappingSound.stop();
             sky.color = k.Color.fromHex(COLORS.BLUE);
             gameManager.nbBulletLeft = 3;
-            gameManager.enterState("duck-escaped");
+            gameManager.state.enterState("duck-escaped");
           });
         },
       },

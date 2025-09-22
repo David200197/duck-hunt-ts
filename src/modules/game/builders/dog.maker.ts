@@ -1,9 +1,9 @@
 import type { Vec2, GameObj } from "kaplay";
-import { InjectK } from "../../kozmoplay/decorators/inject-k";
-import { Injectable } from "../../kozmoplay/decorators/injectable";
-import type { Kaplay } from "../../kozmoplay/interfaces/kaplay";
-import { GameManager } from "./game.manager";
-import { Inject } from "../../kozmoplay/decorators/inject";
+import { InjectK } from "../../../kozmoplay/decorators/inject-k";
+import { Injectable } from "../../../kozmoplay/decorators/injectable";
+import type { Kaplay } from "../../../kozmoplay/interfaces/kaplay";
+import { GameManager } from "../game.manager";
+import { Inject } from "../../../kozmoplay/decorators/inject";
 
 @Injectable()
 export class DogMaker {
@@ -20,7 +20,7 @@ export class DogMaker {
 
   make(position: Vec2) {
     const k = this.k;
-    const gameManager = this.gameManager.data;
+    const gameManager = this.gameManager;
 
     return k.add([
       k.sprite("dog"),
@@ -76,7 +76,7 @@ export class DogMaker {
               },
               k.easings.linear
             );
-            gameManager.enterState("round-start", true);
+            gameManager.state.enterState("round-start", true);
           });
         },
         async slideUpAndDown(this: GameObj) {
@@ -100,14 +100,14 @@ export class DogMaker {
           this.play("catch");
           k.play("successful-hunt");
           await this.slideUpAndDown();
-          gameManager.enterState("hunt-end");
+          gameManager.state.enterState("hunt-end");
         },
         async mockPlayer(this: GameObj) {
           const laughingSound = k.play("laughing");
           this.play("mock");
           await this.slideUpAndDown();
           laughingSound.stop();
-          gameManager.enterState("hunt-end");
+          gameManager.state.enterState("hunt-end");
         },
       },
     ]);

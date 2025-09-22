@@ -1,8 +1,8 @@
 import { ContainerModule } from "inversify";
 import { GameScene } from "./game.scene";
 import { GameManager } from "./game.manager";
-import { DogMaker } from "./dog.maker";
-import { DuckMaker } from "./duck.maker";
+import { DogMaker } from "./builders/dog.maker";
+import { DuckMaker } from "./builders/duck.maker";
 
 export const GameModule = new ContainerModule((ctx) => {
   ctx.bind(GameScene).toSelf().inSingletonScope();
