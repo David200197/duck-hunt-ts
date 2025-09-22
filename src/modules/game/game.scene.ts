@@ -27,6 +27,7 @@ import type {
 import { KeyPress } from "../../kozmoplay/decorators/key-press";
 import { GameManager } from "./game.manager";
 import { Game } from "../../kozmoplay/services/game";
+import { InjectGame } from "../../kozmoplay/decorators/inject-game";
 
 @Scene("game")
 export class GameScene
@@ -53,7 +54,7 @@ export class GameScene
     @Inject(GameManager) gameManager: GameManager,
     @Inject(DogMaker) dogMaker: DogMaker,
     @Inject(DuckMaker) duckMaker: DuckMaker,
-    @Inject(Game) game: Game
+    @InjectGame() game: Game
   ) {
     this.k = k;
     this.gameManager = gameManager;
