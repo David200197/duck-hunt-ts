@@ -3,7 +3,7 @@ import { Injectable } from "../decorators/injectable";
 import type { Kaplay } from "../interfaces/kaplay";
 
 @Injectable()
-export class GlobalGameManager {
+export class Game {
   private readonly k: Kaplay;
 
   constructor(@InjectK() k: Kaplay) {
@@ -19,6 +19,6 @@ export class GlobalGameManager {
     }
     //@ts-ignore
     audioCtx.resume();
-    return false
+    return false;
   }
 }

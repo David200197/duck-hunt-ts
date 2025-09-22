@@ -26,7 +26,7 @@ import type {
 } from "kaplay";
 import { KeyPress } from "../../kozmoplay/decorators/key-press";
 import { GameManager } from "./game.manager";
-import { GlobalGameManager } from "../../kozmoplay/services/global-game.manager";
+import { Game } from "../../kozmoplay/services/game";
 
 @Scene("game")
 export class GameScene
@@ -36,7 +36,7 @@ export class GameScene
   private readonly gameManager: GameManager;
   private readonly dogMaker: DogMaker;
   private readonly duckMaker: DuckMaker;
-  private readonly globalGameManager: GlobalGameManager;
+  private readonly game: Game;
   private roundStartController?: KEventController;
   private roundEndController?: KEventController;
   private huntStartController?: KEventController;
@@ -53,13 +53,13 @@ export class GameScene
     @Inject(GameManager) gameManager: GameManager,
     @Inject(DogMaker) dogMaker: DogMaker,
     @Inject(DuckMaker) duckMaker: DuckMaker,
-    @Inject(GlobalGameManager) globalGameManager: GlobalGameManager
+    @Inject(Game) game: Game
   ) {
     this.k = k;
     this.gameManager = gameManager;
     this.dogMaker = dogMaker;
     this.duckMaker = duckMaker;
-    this.globalGameManager = globalGameManager;
+    this.game = game;
   }
 
   onLoad() {
@@ -245,9 +245,9 @@ export class GameScene
   }
 
   @KeyPress("enter")
-  onKeyPressEnter() {
+  pause() {
     const k = this.k;
-    const isPause = this.globalGameManager.pause();
+    const isPause = this.game.pause();
     this.gameManager.isGamePaused = isPause;
     if (isPause) {
       k.add([k.text("PAUSED", fontConfig), k.pos(5, 5), k.z(3), "paused-text"]);
